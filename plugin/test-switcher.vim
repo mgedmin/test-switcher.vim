@@ -37,7 +37,7 @@
 " buffer in the other window to the test module for the current buffer.
 
 if has('python')
-  python import sys, os
+  python import sys, vim
   python if vim.eval('expand("<sfile>:p:h")') not in sys.path:
     \        sys.path.append(vim.eval('expand("<sfile>:p:h")'))
   python import test_switcher # see test_switcher.py
