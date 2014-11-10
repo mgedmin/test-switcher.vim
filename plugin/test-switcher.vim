@@ -1,7 +1,7 @@
 " File: test-switcher.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.0.0
-" Last Modified: 2014-02-11
+" Version: 1.1.0
+" Last Modified: 2014-11-10
 "
 " Overview
 " --------
@@ -35,6 +35,9 @@
 " corresponding test file for the code currently visible in the next window
 " (when you have a split view), and :OpenTestInOtherWindow which changes the
 " buffer in the other window to the test module for the current buffer.
+"
+" If you want a new file to be created using one of the recognized test
+" patterns, add a ! to the command, e.g. :SwitchCodeAndTest!
 
 if has('python')
   python import sys, vim
@@ -44,20 +47,20 @@ if has('python')
 endif
 
 " Utility function: switch to buffer containing file or open a new buffer
-function! SwitchToFile(name)
+function! SwitchToFile(name, bang)
   let tmp = bufnr(a:name)
-  if tmp == -1
-    exe 'edit ' . a:name
-  else
+  if tmp != -1
     exe 'edit #'. tmp
+  elseif a:bang != ""
+    exe 'edit ' . a:name
   endif
 endf
 
 
 " If you're editing /path/to/foo.py, open /path/to/tests/test_foo.py
-function! SwitchCodeAndTest()
+function! SwitchCodeAndTest(bang)
   if has('python')
-    python test_switcher.switch_code_and_test(verbose=int(vim.eval('&verbose')))
+    python test_switcher.switch_code_and_test(verbose=int(vim.eval('&verbose')), new_file_allowed=bool(vim.eval('a:bang')))
     return
   endif
   echo "Python not available, using hardcoded fallback logic"
@@ -68,10 +71,10 @@ function! SwitchCodeAndTest()
     if !filereadable(filename) && package == name
       let filename = fnamemodify(filename, ':h') . '/__init__.py'
     endif
-    call SwitchToFile(filename)
+    call SwitchToFile(filename, a:bang)
   elseif match(expand('%:t'), "^test_") == 0
     let filename = substitute(expand('%:p'), "test_", "", "")
-    call SwitchToFile(filename)
+    call SwitchToFile(filename, a:bang)
   else
     let filename = expand('%:t')
     if filename == '__init__.py'
@@ -81,24 +84,24 @@ function! SwitchCodeAndTest()
     let dir = dir == "" ? "" : dir . "/"
     let proper_test_fn = dir . 'tests/test_' . filename
     if filereadable(dir . 'tests.py') && !filereadable(proper_test_fn)
-      call SwitchToFile(dir . 'tests.py')
+      call SwitchToFile(dir . 'tests.py', a:bang)
     elseif filereadable(dir . 'test_' . filename) && !filereadable(proper_test_fn)
-      call SwitchToFile(dir . 'test_' . filename)
+      call SwitchToFile(dir . 'test_' . filename, a:bang)
     else
-      call SwitchToFile(proper_test_fn)
+      call SwitchToFile(proper_test_fn, a:bang)
     endif
   endif
 endf
-command! -count=1 SwitchCodeAndTest      call SwitchCodeAndTest()
+command! -bang -bar -count=1 SwitchCodeAndTest      call SwitchCodeAndTest(<q-bang>)
 
 
-function! OpenTestInOtherWindow()
+function! OpenTestInOtherWindow(bang)
   let bn = bufnr('%')
   wincmd p
   exe "buffer" . bn
-  SwitchCodeAndTest
+  call SwitchCodeAndTest(a:bang)
 endf
-command! OpenTestInOtherWindow           call OpenTestInOtherWindow()
+command! -bang -bar OpenTestInOtherWindow           call OpenTestInOtherWindow(<q-bang>)
 
 
 function! TestForTheOtherWindow()
@@ -106,6 +109,6 @@ function! TestForTheOtherWindow()
   let bn = bufnr('%')
   wincmd p
   exe "buffer" . bn
-  SwitchCodeAndTest
+  call SwitchCodeAndTest(a:bang)
 endf
-command! TestForTheOtherWindow          call TestForTheOtherWindow()
+command! -bang -bar TestForTheOtherWindow          call TestForTheOtherWindow(<q-bang>)

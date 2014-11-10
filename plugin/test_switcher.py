@@ -82,7 +82,7 @@ def find_all_matches(filename):
     return filter(None, results)
 
 
-def find_best_match(filename, nth=1):
+def find_best_match(filename, nth=1, new_file_allowed=True):
     matches = find_all_matches(filename)
     if DEBUG:
         print "Found %d matches, going with %dth" % (len(matches), nth)
@@ -101,6 +101,10 @@ def find_best_match(filename, nth=1):
         else:
             if DEBUG:
                 print ".. skipping %s: it doesn't exist" % match
+    if not new_file_allowed:
+        if DEBUG:
+            print "giving up"
+        return None
     for match in matches:
         if os.path.exists(os.path.dirname(match)):
             nth -= 1
@@ -114,25 +118,25 @@ def find_best_match(filename, nth=1):
                 last_valid_match = match
         else:
             if DEBUG:
-                print ".. skipping %s: it parent directory doesn't exist" % match
+                print ".. skipping %s: its parent directory doesn't exist" % match
     # there were fewer than n matches, return the last one
     if DEBUG:
         print ".. using last skipped match %s" % match
     return last_valid_match
 
 
-def switch_code_and_test(verbose=False):
+def switch_code_and_test(verbose=False, new_file_allowed=True):
     global DEBUG
     DEBUG = verbose
     filename = vim.eval('expand("%:p")')
     if DEBUG:
         print filename
     nth = int(vim.eval('v:count1'))
-    newfilename = find_best_match(filename, nth)
+    newfilename = find_best_match(filename, nth, new_file_allowed=new_file_allowed)
     if newfilename:
         if DEBUG:
             print '->', newfilename
-        vim.command('call SwitchToFile(%r)' % newfilename)
+        vim.command('call SwitchToFile(%r, "%s")' % (newfilename, "!" if new_file_allowed else ""))
     else:
         pass
 
