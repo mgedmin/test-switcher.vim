@@ -58,7 +58,7 @@ def pattern2regex(pattern):
 
 def try_match(filename, pattern, replacement):
     if DEBUG:
-        print 'trying %s -> %s' % (pattern, replacement)
+        print '.. trying %s -> %s' % (pattern, replacement)
     if '%' in replacement and '%' not in pattern:
         return None
     rx = pattern2regex(pattern)
@@ -84,22 +84,40 @@ def find_all_matches(filename):
 
 def find_best_match(filename, nth=1):
     matches = find_all_matches(filename)
+    if DEBUG:
+        print "Found %d matches, going with %dth" % (len(matches), nth)
     last_valid_match = None
     for match in matches:
         if os.path.exists(match):
             nth -= 1
             if nth == 0:
+                if DEBUG:
+                    print ".. going with existing file %s" % match
                 return match
             else:
+                if DEBUG:
+                    print ".. skipping existing file %s" % match
                 last_valid_match = match
+        else:
+            if DEBUG:
+                print ".. skipping %s: it doesn't exist" % match
     for match in matches:
         if os.path.exists(os.path.dirname(match)):
             nth -= 1
             if nth == 0:
+                if DEBUG:
+                    print ".. going with new file %s" % match
                 return match
             else:
+                if DEBUG:
+                    print ".. skipping new file %s" % match
                 last_valid_match = match
+        else:
+            if DEBUG:
+                print ".. skipping %s: it parent directory doesn't exist" % match
     # there were fewer than n matches, return the last one
+    if DEBUG:
+        print ".. using last skipped match %s" % match
     return last_valid_match
 
 
