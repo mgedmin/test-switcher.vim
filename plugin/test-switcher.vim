@@ -1,7 +1,7 @@
 " File: test-switcher.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.1.0
-" Last Modified: 2014-11-10
+" Version: 1.1.1
+" Last Modified: 2014-11-11
 "
 " Overview
 " --------
@@ -51,7 +51,7 @@ function! SwitchToFile(name, bang)
   let tmp = bufnr(a:name)
   if tmp != -1
     exe 'edit #'. tmp
-  elseif a:bang != ""
+  elseif a:bang != "" || filereadable(a:name)
     exe 'edit ' . a:name
   endif
 endf
