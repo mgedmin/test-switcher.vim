@@ -1,7 +1,7 @@
 " File: test-switcher.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.1.1
-" Last Modified: 2014-11-11
+" Version: 1.1.2
+" Last Modified: 2014-11-20
 "
 " Overview
 " --------
@@ -104,7 +104,7 @@ endf
 command! -bang -bar OpenTestInOtherWindow           call OpenTestInOtherWindow(<q-bang>)
 
 
-function! TestForTheOtherWindow()
+function! TestForTheOtherWindow(bang)
   wincmd p
   let bn = bufnr('%')
   wincmd p
