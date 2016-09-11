@@ -1,7 +1,7 @@
 " File: test-switcher.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.1.2
-" Last Modified: 2014-11-20
+" Version: 1.2.0
+" Last Modified: 2016-09-11
 "
 " Overview
 " --------
@@ -39,11 +39,9 @@
 " If you want a new file to be created using one of the recognized test
 " patterns, add a ! to the command, e.g. :SwitchCodeAndTest!
 
-if has('python')
-  python import sys, vim
-  python if vim.eval('expand("<sfile>:p:h")') not in sys.path:
-    \        sys.path.append(vim.eval('expand("<sfile>:p:h")'))
-  python import test_switcher # see test_switcher.py
+if has('python') || has('python3')
+  let s:python = has('python3') ? 'python3' : 'python'
+  exec s:python "import test_switcher # see test_switcher.py"
 endif
 
 " Utility function: switch to buffer containing file or open a new buffer
@@ -59,8 +57,8 @@ endf
 
 " If you're editing /path/to/foo.py, open /path/to/tests/test_foo.py
 function! SwitchCodeAndTest(bang)
-  if has('python')
-    python test_switcher.switch_code_and_test(verbose=int(vim.eval('&verbose')), new_file_allowed=bool(vim.eval('a:bang')))
+  if has('python') || has('python3')
+    exec s:python "test_switcher.switch_code_and_test(verbose=int(vim.eval('&verbose')), new_file_allowed=bool(vim.eval('a:bang')))"
     return
   endif
   echo "Python not available, using hardcoded fallback logic"

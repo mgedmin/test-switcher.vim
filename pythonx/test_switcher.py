@@ -58,18 +58,18 @@ def pattern2regex(pattern):
 
 def try_match(filename, pattern, replacement):
     if DEBUG:
-        print '.. trying %s -> %s' % (pattern, replacement)
+        print('.. trying %s -> %s' % (pattern, replacement))
     if '%' in replacement and '%' not in pattern:
         return None
     rx = pattern2regex(pattern)
     if not rx.search(filename):
         return None
     if DEBUG:
-        print 'MATCH: %s -> %s' % (pattern, replacement)
+        print('MATCH: %s -> %s' % (pattern, replacement))
     replacement = r'\1' + replacement.replace('%', r'\2')
     candidate = rx.sub(replacement, filename)
     if candidate == filename:
-        print 'rejecting %s: same as original'
+        print('rejecting %s: same as original' % candidate)
         return None
     return candidate
 
@@ -85,43 +85,43 @@ def find_all_matches(filename):
 def find_best_match(filename, nth=1, new_file_allowed=True):
     matches = find_all_matches(filename)
     if DEBUG:
-        print "Found %d matches, going with %dth" % (len(matches), nth)
+        print("Found %d matches, going with %dth" % (len(matches), nth))
     last_valid_match = None
     for match in matches:
         if os.path.exists(match):
             nth -= 1
             if nth == 0:
                 if DEBUG:
-                    print ".. going with existing file %s" % match
+                    print(".. going with existing file %s" % match)
                 return match
             else:
                 if DEBUG:
-                    print ".. skipping existing file %s" % match
+                    print(".. skipping existing file %s" % match)
                 last_valid_match = match
         else:
             if DEBUG:
-                print ".. skipping %s: it doesn't exist" % match
+                print(".. skipping %s: it doesn't exist" % match)
     if not new_file_allowed:
         if DEBUG:
-            print "giving up"
+            print("giving up")
         return None
     for match in matches:
         if os.path.exists(os.path.dirname(match)):
             nth -= 1
             if nth == 0:
                 if DEBUG:
-                    print ".. going with new file %s" % match
+                    print(".. going with new file %s" % match)
                 return match
             else:
                 if DEBUG:
-                    print ".. skipping new file %s" % match
+                    print(".. skipping new file %s" % match)
                 last_valid_match = match
         else:
             if DEBUG:
-                print ".. skipping %s: its parent directory doesn't exist" % match
+                print(".. skipping %s: its parent directory doesn't exist" % match)
     # there were fewer than n matches, return the last one
     if DEBUG:
-        print ".. using last skipped match %s" % match
+        print(".. using last skipped match %s" % match)
     return last_valid_match
 
 
@@ -130,12 +130,12 @@ def switch_code_and_test(verbose=False, new_file_allowed=True):
     DEBUG = verbose
     filename = vim.eval('expand("%:p")')
     if DEBUG:
-        print filename
+        print(filename)
     nth = int(vim.eval('v:count1'))
     newfilename = find_best_match(filename, nth, new_file_allowed=new_file_allowed)
     if newfilename:
         if DEBUG:
-            print '->', newfilename
+            print('-> %s' % newfilename)
         vim.command('call SwitchToFile(%r, "%s")' % (newfilename, "!" if new_file_allowed else ""))
     else:
         pass
