@@ -56,12 +56,15 @@ endf
 
 
 " If you're editing /path/to/foo.py, open /path/to/tests/test_foo.py
-function! SwitchCodeAndTest(bang)
+function! SwitchCodeAndTest(bang, count)
   if has('python') || has('python3')
-    exec s:python "test_switcher.switch_code_and_test(verbose=int(vim.eval('&verbose')), new_file_allowed=bool(vim.eval('a:bang')))"
+    exec s:python "test_switcher.switch_code_and_test(verbose=int(vim.eval('&verbose')), new_file_allowed=bool(vim.eval('a:bang')), nth=int(vim.eval('a:count')))"
     return
   endif
   echo "Python not available, using hardcoded fallback logic"
+  if count != 1
+    echo "ignoring count"
+  endif
   if expand('%:p:h:t') == 'tests'
     let filename = substitute(expand('%:p'), "tests/test_", "", "")
     let package = fnamemodify(filename, ':h:t')
@@ -90,23 +93,23 @@ function! SwitchCodeAndTest(bang)
     endif
   endif
 endf
-command! -bang -bar -count=1 SwitchCodeAndTest      call SwitchCodeAndTest(<q-bang>)
+command! -bang -bar -count=1 SwitchCodeAndTest      call SwitchCodeAndTest(<q-bang>, <count>)
 
 
-function! OpenTestInOtherWindow(bang)
+function! OpenTestInOtherWindow(bang, count)
   let bn = bufnr('%')
   wincmd p
   exe "buffer" . bn
-  call SwitchCodeAndTest(a:bang)
+  call SwitchCodeAndTest(a:bang, a:count)
 endf
-command! -bang -bar OpenTestInOtherWindow           call OpenTestInOtherWindow(<q-bang>)
+command! -bang -bar -count=1 OpenTestInOtherWindow  call OpenTestInOtherWindow(<q-bang>, <count>)
 
 
-function! TestForTheOtherWindow(bang)
+function! TestForTheOtherWindow(bang, count)
   wincmd p
   let bn = bufnr('%')
   wincmd p
   exe "buffer" . bn
-  call SwitchCodeAndTest(a:bang)
+  call SwitchCodeAndTest(a:bang, a:count)
 endf
-command! -bang -bar TestForTheOtherWindow          call TestForTheOtherWindow(<q-bang>)
+command! -bang -bar -count=1 TestForTheOtherWindow  call TestForTheOtherWindow(<q-bang>, <count>)

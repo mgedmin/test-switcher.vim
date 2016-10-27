@@ -130,13 +130,12 @@ def find_best_match(filename, nth=1, new_file_allowed=True):
     return last_valid_match
 
 
-def switch_code_and_test(verbose=False, new_file_allowed=True):
+def switch_code_and_test(verbose=False, new_file_allowed=True, nth=1):
     global DEBUG
     DEBUG = verbose
     filename = vim.eval('expand("%:p")')
     if DEBUG:
         print(filename)
-    nth = int(vim.eval('v:count1'))
     newfilename = find_best_match(filename, nth, new_file_allowed=new_file_allowed)
     if newfilename:
         if DEBUG:
