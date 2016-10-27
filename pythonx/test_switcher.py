@@ -89,7 +89,8 @@ def find_all_matches(filename):
 def find_best_match(filename, nth=1, new_file_allowed=True):
     matches = find_all_matches(filename)
     if DEBUG:
-        print("Found %d matches, going with %dth" % (len(matches), nth))
+        th = {1: 'st', 2: 'nd', 3: 'rd'}.get(nth, 'th')
+        print("Found %d matches, going with %d%s" % (len(matches), nth, th))
     last_valid_match = None
     for match in matches:
         if os.path.exists(match):
