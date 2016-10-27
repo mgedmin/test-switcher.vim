@@ -1,6 +1,10 @@
 """
 " HACK to make this file source'able by vim as well as importable by Python:
-python reload(test_switcher)
+if has('python3')
+  py3 from importlib import reload; reload(test_switcher)
+else
+  py reload(test_switcher)
+endif
 finish
 """
 
