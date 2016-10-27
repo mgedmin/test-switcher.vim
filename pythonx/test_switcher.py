@@ -83,7 +83,7 @@ def find_all_matches(filename):
     for a, b in get_patterns():
         results.append(try_match(filename, a, b))
         results.append(try_match(filename, b, a))
-    return filter(None, results)
+    return list(filter(None, results))
 
 
 def find_best_match(filename, nth=1, new_file_allowed=True):
