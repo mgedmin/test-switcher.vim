@@ -61,7 +61,7 @@ def pattern2regex(pattern):
 
 
 def try_match(filename, pattern, replacement):
-    if DEBUG:
+    if DEBUG >= 2:
         print('.. trying %s -> %s' % (pattern, replacement))
     if '%' in replacement and '%' not in pattern:
         return None
