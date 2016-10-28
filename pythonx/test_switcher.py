@@ -123,7 +123,8 @@ def find_best_match(filename, nth=1, new_file_allowed=True):
                 last_valid_match = match
         else:
             if DEBUG:
-                print(".. skipping %s: its parent directory doesn't exist" % match)
+                print(".. skipping %s: its parent directory doesn't exist"
+                      % match)
     # there were fewer than n matches, return the last one
     if DEBUG:
         print(".. using last skipped match %s" % match)
@@ -136,11 +137,13 @@ def switch_code_and_test(verbose=False, new_file_allowed=True, nth=1):
     filename = vim.eval('expand("%:p")')
     if DEBUG:
         print(filename)
-    newfilename = find_best_match(filename, nth, new_file_allowed=new_file_allowed)
+    newfilename = find_best_match(filename, nth,
+                                  new_file_allowed=new_file_allowed)
     if newfilename:
         if DEBUG:
             print('-> %s' % newfilename)
-        vim.command('call SwitchToFile(%r, "%s")' % (newfilename, "!" if new_file_allowed else ""))
+        newfilename = os.path.relpath(newfilename)
+        vim.command('call SwitchToFile(%r, "%s")'
+                    % (newfilename, "!" if new_file_allowed else ""))
     else:
         pass
-
