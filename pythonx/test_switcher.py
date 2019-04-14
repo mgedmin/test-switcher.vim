@@ -110,6 +110,7 @@ def find_best_match(filename, nth=1, new_file_allowed=True):
         if DEBUG:
             print("giving up")
         return None
+    print("Looking for an existing test directory to create a new file")
     for match in matches:
         if os.path.exists(os.path.dirname(match)):
             nth -= 1
