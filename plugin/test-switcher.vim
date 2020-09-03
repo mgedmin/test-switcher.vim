@@ -1,7 +1,7 @@
 " File: test-switcher.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.2.0
-" Last Modified: 2016-09-11
+" Version: 2.0.0
+" Last Modified: 2020-09-03
 "
 " Overview
 " --------
@@ -18,7 +18,7 @@
 "
 " Installation
 " ------------
-" Copy this file and test_switcher.py to $HOME/.vim/plugin directory.
+" I recommend a plugin manager like vim-plug.
 "
 " You need vim compiled with Python support.  There's some fallback code
 " in pure VimL, but it isn't very smart, and it isn't configurable.

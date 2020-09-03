@@ -52,12 +52,25 @@ def get_patterns():
     return default_patterns
 
 
-def pattern2regex(pattern):
-    if '%' in pattern:
-        idx = pattern.index('%') + 1
-        pattern = (pattern[:idx].replace('%', '([^/]+)') +
-                   pattern[idx:].replace('%', '\\1'))
-    return re.compile('(^|/)' + pattern.replace('.', '\\.') + '$')
+def pattern2regex(pattern, replacement):
+    n = max(1, replacement.count('%'))
+    pattern = ''.join(
+        (
+            '(^|/)' if idx == 0 else
+            '([^/]+)' if idx <= n else
+            '\\%d' % n
+        ) + part.replace('.', '\\.')
+        for idx, part in enumerate(pattern.split('%'))
+    ) + '$'
+    return re.compile(pattern)
+
+
+def prepare_replacement(pattern, replacement):
+    n = max(1, pattern.count('%')) + 1
+    return ''.join(
+        '\\%d%s' % (min(idx, n), part)
+        for idx, part in enumerate(replacement.split('%'), 1)
+    )
 
 
 def try_match(filename, pattern, replacement):
@@ -65,12 +78,12 @@ def try_match(filename, pattern, replacement):
         print('.. trying %s -> %s' % (pattern, replacement))
     if '%' in replacement and '%' not in pattern:
         return None
-    rx = pattern2regex(pattern)
+    rx = pattern2regex(pattern, replacement)
     if not rx.search(filename):
         return None
     if DEBUG:
         print('MATCH: %s -> %s' % (pattern, replacement))
-    replacement = r'\1' + replacement.replace('%', r'\2')
+    replacement = prepare_replacement(pattern, replacement)
     candidate = rx.sub(replacement, filename)
     if candidate == filename:
         print('rejecting %s: same as original' % candidate)
