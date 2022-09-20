@@ -1,7 +1,7 @@
 " File: test-switcher.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 2.0.0
-" Last Modified: 2020-09-03
+" Version: 2.0.1
+" Last Modified: 2022-09-20
 "
 " Overview
 " --------
@@ -47,9 +47,15 @@ endif
 " Utility function: switch to buffer containing file or open a new buffer
 function! SwitchToFile(name, bang)
   let tmp = bufnr(a:name)
-  if tmp != -1
-    exe 'edit #'. tmp
+  if tmp != -1 && fnamemodify(bufname(tmp), ":p") == fnamemodify(a:name, ":p")
+    if &verbose >= 2
+      echo 'edit #' . tmp
+    endif
+    exe 'edit #' . tmp
   elseif a:bang != "" || filereadable(a:name)
+    if &verbose >= 2
+      echo 'edit ' . a:name
+    endif
     exe 'edit ' . a:name
   endif
 endf
